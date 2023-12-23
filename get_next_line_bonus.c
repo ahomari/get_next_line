@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ahomari <ahomari@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/07 21:06:56 by ahomari           #+#    #+#             */
-/*   Updated: 2023/12/22 11:39:24 by ahomari          ###   ########.fr       */
+/*   Created: 2023/12/18 10:16:43 by ahomari           #+#    #+#             */
+/*   Updated: 2023/12/22 11:38:45 by ahomari          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static char	*read_fun(int fd, char *tmp)
 {
@@ -83,18 +83,22 @@ static char	*ft_skip(char *line)
 
 char	*get_next_line(int fd)
 {
-	static char	*tmp;
+	static char	*tmp[OPEN_MAX];
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || fd > OPEN_MAX
 		|| BUFFER_SIZE > INT_MAX || read(fd, 0, 0) == -1)
-		return (free(tmp), tmp = NULL, NULL);
-	tmp = read_fun(fd, tmp);
-	if (!tmp || tmp[0] == '\0')
-		return (free(tmp), tmp = NULL, NULL);
-	line = ft_print_line(tmp);
+	{
+		if (tmp[fd] != NULL)
+			return (free(tmp[fd]), tmp[fd] = NULL, NULL);
+		return (NULL);
+	}
+	tmp[fd] = read_fun(fd, tmp[fd]);
+	if (!tmp[fd] || tmp[fd][0] == '\0')
+		return (free(tmp[fd]), tmp[fd] = NULL, NULL);
+	line = ft_print_line(tmp[fd]);
 	if (!line)
-		return (free(tmp), tmp = NULL, NULL);
-	tmp = ft_skip(tmp);
+		return (free(tmp[fd]), tmp[fd] = NULL, NULL);
+	tmp[fd] = ft_skip(tmp[fd]);
 	return (line);
 }
